@@ -1,28 +1,24 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class PrinterFactory {
-    private List<Map.Entry<Condition, Printer>> pairs = new ArrayList<>();
+    private List<Map.Entry<Predicate<Integer>, Supplier<String>>> pairs = new ArrayList<>();
 
     public PrinterFactory() {
-        Condition fizzBuzzCondition = number -> number % 15 == 0;
-        Printer fizzBuzzPrinter = () -> "FizzBuzz";
-        pairs.add(Map.entry(fizzBuzzCondition, fizzBuzzPrinter));
-        Condition buzzCondition = number -> number % 5 == 0;
-        Printer buzzPrinter = () -> "Buzz";
-        pairs.add(Map.entry(buzzCondition, buzzPrinter));
-        Condition fizzCondition = number -> number % 3 == 0;
-        Printer fizzPrinter = () -> "Fizz";
-        pairs.add(Map.entry(fizzCondition, fizzPrinter));
+        pairs.add(Map.entry(number -> number % 15 == 0, () -> "FizzBuzz"));
+        pairs.add(Map.entry(number -> number % 5 == 0, () -> "Buzz"));
+        pairs.add(Map.entry(number -> number % 3 == 0, () -> "Fizz"));
     }
 
     public String print(int number) {
         return pairs.stream()
-                .filter(pair -> pair.getKey().isSatisfied(number))
+                .filter(pair -> pair.getKey().test(number))
                 .findFirst()
                 .map(Map.Entry::getValue)
-                .map(Printer::print)
+                .map(Supplier::get)
                 .orElse(String.valueOf(number));
     }
 }
